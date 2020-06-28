@@ -1,3 +1,4 @@
+#if 0
 /*
 	This file is part of the implementation for the technical paper
 
@@ -735,3 +736,5 @@ void osr::write_obj(const std::string &filename, const MatrixXu &F,
 		std::cout << irregular.size() << " irregular faces, ";
 	std::cout << "took " << nse::util::timeString(timer.value()) << ")" << std::endl;
 }
+
+#endif

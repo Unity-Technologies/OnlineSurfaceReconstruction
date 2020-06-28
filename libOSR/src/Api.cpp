@@ -6,10 +6,10 @@ struct Mesh
 {
 	float* Vertices;
 	float* Normals;
-	int32_t* Triangles;
+	int* Triangles;
 
-	int32_t VertexCount;
-	int32_t TriangleCount;
+	int VertexCount;
+	int TriangleCount;
 };
 
 struct Parameters
@@ -64,7 +64,7 @@ extern "C" void OSR_EXPORT free_mesh(Mesh* mesh)
 	delete[] mesh->Triangles;
 }
 
-extern "C" void OSR_EXPORT process_mesh(Mesh* input, Parameters* params, Mesh* output)
+extern "C" void OSR_EXPORT process_mesh(Mesh* input, Parameters* parameters, Mesh* output)
 {
 	MatrixXf V = Eigen::Map<MatrixXf>(input->Vertices, 3, input->VertexCount);
 	MatrixXf N = Eigen::Map<MatrixXf>(input->Normals, 3, input->VertexCount);
@@ -78,10 +78,10 @@ extern "C" void OSR_EXPORT process_mesh(Mesh* input, Parameters* params, Mesh* o
 	data.meshSettings.rosy = std::shared_ptr<IOrientationFieldTraits>(getOrientationFieldTraits(6));
 	data.meshSettings.posy = std::shared_ptr<IPositionFieldTraits>(getPositionFieldTraits(6));
 
-	if (params->Scale > 0)
-		data.meshSettings.setScale(params->Scale);
-	if (params->Smoothness >= 0 && params->Smoothness < 1)
-		data.meshSettings.smoothness = params->Smoothness;
+	if (parameters->Scale > 0)
+		data.meshSettings.setScale(parameters->Scale);
+	if (parameters->Smoothness >= 0 && parameters->Smoothness < 1)
+		data.meshSettings.smoothness = parameters->Smoothness;
 	
 	data.AddScan(&scan);
 	data.IntegrateScan(&scan);

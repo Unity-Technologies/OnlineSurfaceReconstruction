@@ -29,6 +29,7 @@
 #include <random>
 #include <iostream>
 #include <memory>
+#include <map>
 
 namespace osr
 {
