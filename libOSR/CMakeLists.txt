@@ -6,7 +6,9 @@ option(OSR_ACCURATE_TIMING "Display all timings in ms")
 option(OSR_DEBUG_VISUALIZATION "Generate debug visualizations")
 option(OSR_REDUCED_TIMINGS "Measure time only for high-priority nse::util::TimedBlocks")
 option(OSR_GEOMETRIC_LAPLACIAN "Use the more time-consuming but higher-quality geometric formulation of the Laplacian for displacement map calculation")
-option(OSR_USE_MEMORY_MAPPED_FILE "Use the boost memory-mapped file for XYZ input. This requires the boost iostreams library.")
+option(OSR_USE_MEMORY_MAPPED_FILE "Use the boost memory-mapped file for XYZ input. This requires the boost iostreams library." OFF)
+
+cmake_policy(SET CMP0074 OLD)
 
 set(LIBS)
 set(OSR_ADDITIONAL_INCLUDE_DIR)
@@ -89,6 +91,7 @@ if(OSR_USE_MEMORY_MAPPED_FILE)
 	add_definitions(/DOSR_USE_MEMORY_MAPPED_FILE)
 endif()
 
+SET(Boost_INCLUDE_DIR "../ext/boost_reduced/")
 find_package(Boost COMPONENTS ${BOOST_COMPONENTS} REQUIRED)
 if(MSVC AND (MSVC_VERSION LESS 1600))
 	set(OSR_EXTRA_DEFS ${OSR_EXTRA_DEFS} -DBOOST_STDINT)
@@ -148,9 +151,12 @@ source_group(third_party FILES ${THIRD_PARTY})
 
 set(LIBS ${LIBS} ${OSR_ADDITIONAL_LIBS})
 
-SET(OSR_ADDITIONAL_INCLUDE_DIR ${OSR_ADDITIONAL_INCLUDE_DIR} PARENT_SCOPE)
-SET(OSR_ADDITIONAL_LIBS ${OSR_ADDITIONAL_LIBS} PARENT_SCOPE)
-SET(OSR_EXTRA_DEFS ${OSR_EXTRA_DEFS} PARENT_SCOPE)
+get_directory_property(hasParent PARENT_DIRECTORY)
+if(hasParent)
+	SET(OSR_ADDITIONAL_INCLUDE_DIR ${OSR_ADDITIONAL_INCLUDE_DIR} PARENT_SCOPE)
+	SET(OSR_ADDITIONAL_LIBS ${OSR_ADDITIONAL_LIBS} PARENT_SCOPE)
+	SET(OSR_EXTRA_DEFS ${OSR_EXTRA_DEFS} PARENT_SCOPE)
+endif()
 
 add_library(OSR SHARED	
 	include/osr/Attributes.h
