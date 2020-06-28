@@ -1,0 +1,13 @@
+*.sln
+*.vcxproj
+*.vcxproj.filters
+ext_build/
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+OSR.dir/
+x86
+x64
+Debug
+Release
+RelWithDebInfo
