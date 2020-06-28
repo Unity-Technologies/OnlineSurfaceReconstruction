@@ -159,6 +159,7 @@ if(hasParent)
 endif()
 
 add_library(OSR SHARED	
+	src/Api.cpp
 	include/osr/Attributes.h
 	include/osr/AttributeConsistency.h
 	src/common.cpp include/osr/common.h
