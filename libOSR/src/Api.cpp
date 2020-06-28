@@ -29,6 +29,11 @@ class OSR_EXPORT ExtractMeshVisitor : public MeshVisitor
 public:
 	Mesh Mesh;
 	
+	ExtractMeshVisitor()
+	{
+		NextVertex = 0;
+		NextFace = 0;
+	}
 	
 	void begin(unsigned int vertices, unsigned int faces)
 	{
@@ -37,7 +42,9 @@ public:
 		Mesh.Normals = NULL;
 
 		Mesh.TriangleCount = faces;
-		Mesh.Triangles = new int32_t[3 * vertices];
+		Mesh.Triangles = new int32_t[3 * faces];
+		NextVertex = 0;
+		NextFace = 0;
 	}
 	
 	void addVertex(const Eigen::Vector3f& position, const Eigen::Vector3f& color)
@@ -54,14 +61,27 @@ public:
 		NextFace += count;
 	}
 	
-	void end() { }
+	void end()
+    {
+        if (NextFace != Mesh.TriangleCount * 3)
+        {
+            printf("Failed triangle count");
+        }
+        if (NextVertex != Mesh.VertexCount * 3)
+        {
+            printf("Failed triangle count");
+        }
+    }
 };
 
 extern "C" void OSR_EXPORT free_mesh(Mesh* mesh)
 {
-	delete[] mesh->Triangles;
-	delete[] mesh->Normals;
-	delete[] mesh->Triangles;
+    if (mesh->Vertices != NULL)
+        delete[] mesh->Vertices;
+    if (mesh->Normals != NULL)
+        delete[] mesh->Normals;
+    if (mesh->Triangles != NULL)
+        delete[] mesh->Triangles;
 }
 
 extern "C" void OSR_EXPORT process_mesh(Mesh* input, Parameters* parameters, Mesh* output)
@@ -72,7 +92,7 @@ extern "C" void OSR_EXPORT process_mesh(Mesh* input, Parameters* parameters, Mes
 	
 	Matrix3Xus C; // color, we'll ignore it.
 	
-	Scan scan(V, N, C, F, "");
+	Scan* scan = new Scan(V, N, C, F, "");
 	
 	Data data;
 	data.meshSettings.rosy = std::shared_ptr<IOrientationFieldTraits>(getOrientationFieldTraits(6));
@@ -83,8 +103,8 @@ extern "C" void OSR_EXPORT process_mesh(Mesh* input, Parameters* parameters, Mes
 	if (parameters->Smoothness >= 0 && parameters->Smoothness < 1)
 		data.meshSettings.smoothness = parameters->Smoothness;
 	
-	data.AddScan(&scan);
-	data.IntegrateScan(&scan);
+	data.AddScan(scan);
+	data.IntegrateScan(scan);
 	
 	ExtractMeshVisitor mesh;
 	data.extractedMesh.extractFineMesh(mesh, true);
